@@ -21,6 +21,8 @@ var (
 	oauthUserInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=%s&code=%s"
 	//oauthQrContentTargetURL 构造独立窗口登录二维码
 	oauthQrContentTargetURL = "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=%s&agentid=%s&redirect_uri=%s&state=%s"
+	//code2Session 获取用户信息地址
+	code2SessionURL = "https://qyapi.weixin.qq.com/cgi-bin/miniprogram/jscode2session?access_token=%s&js_code=%s&grant_type=authorization_code"
 )
 
 //NewOauth new init oauth
@@ -74,6 +76,27 @@ func (ctr *Oauth) UserFromCode(code string) (result ResUserInfo, err error) {
 	var response []byte
 	response, err = util.HTTPGet(
 		fmt.Sprintf(oauthUserInfoURL, accessToken, code),
+	)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(response, &result)
+	if result.ErrCode != 0 {
+		err = fmt.Errorf("GetUserAccessToken error : errcode=%v , errmsg=%v", result.ErrCode, result.ErrMsg)
+		return
+	}
+	return
+}
+
+func (ctr *Oauth) Code2Session(code string) (result ResUserInfo, err error) {
+	var accessToken string
+	accessToken, err = ctr.GetAccessToken()
+	if err != nil {
+		return
+	}
+	var response []byte
+	response, err = util.HTTPGet(
+		fmt.Sprintf(code2SessionURL, accessToken, code),
 	)
 	if err != nil {
 		return
