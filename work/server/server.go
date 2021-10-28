@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"runtime/debug"
@@ -25,8 +24,6 @@ type Server struct {
 
 	skipValidate bool
 
-	openID string
-
 	messageHandler func(*message.MixMessage) *message.Reply
 
 	RequestRawXMLMsg  []byte
@@ -34,10 +31,9 @@ type Server struct {
 	ResponseRawXMLMsg []byte
 	ResponseMsg       interface{}
 
-	isSafeMode bool
-	random     []byte
-	nonce      string
-	timestamp  int64
+	random    []byte
+	nonce     string
+	timestamp int64
 }
 
 //NewServer init
@@ -52,9 +48,6 @@ func (srv *Server) VerifyURL() (string, error) {
 	nonce := srv.Query("nonce")
 	signature := srv.Query("msg_signature")
 	echoStr := srv.Query("echostr")
-	log.Info("Signature----", util.CalSignature(srv.Token, timestamp, nonce))
-	log.Info("Signature----", util.Signature(srv.Token, timestamp, nonce, echoStr))
-	log.Info("srv.Token---", srv.Token)
 	if signature != util.Signature(srv.Token, timestamp, nonce, echoStr) {
 		return "", NewSDKErr(40001)
 	}
@@ -73,17 +66,6 @@ func (srv *Server) SkipValidate(skip bool) {
 
 //Serve 处理微信的请求消息
 func (srv *Server) Serve() error {
-	if !srv.Validate() {
-		log.Error("Validate Signature Failed.")
-		return fmt.Errorf("请求校验失败")
-	}
-
-	echostr, exists := srv.GetQuery("echostr")
-	if exists {
-		srv.String(echostr)
-		return nil
-	}
-
 	response, err := srv.handleRequest()
 	if err != nil {
 		return err
@@ -91,7 +73,6 @@ func (srv *Server) Serve() error {
 
 	//debug print request msg
 	log.Debugf("request msg =%s", string(srv.RequestRawXMLMsg))
-
 	return srv.buildResponse(response)
 }
 
@@ -109,15 +90,6 @@ func (srv *Server) Validate() bool {
 
 //HandleRequest 处理微信的请求
 func (srv *Server) handleRequest() (reply *message.Reply, err error) {
-	//set isSafeMode
-	srv.isSafeMode = false
-	encryptType := srv.Query("encrypt_type")
-	if encryptType == "aes" {
-		srv.isSafeMode = true
-	}
-
-	//set openID
-	srv.openID = srv.Query("openid")
 
 	var msg interface{}
 	msg, err = srv.getMessage()
@@ -133,45 +105,34 @@ func (srv *Server) handleRequest() (reply *message.Reply, err error) {
 	return
 }
 
-//GetOpenID return openID
-func (srv *Server) GetOpenID() string {
-	return srv.openID
-}
-
 //getMessage 解析微信返回的消息
 func (srv *Server) getMessage() (interface{}, error) {
 	var rawXMLMsgBytes []byte
 	var err error
-	if srv.isSafeMode {
-		var encryptedXMLMsg message.EncryptedXMLMsg
-		if err := xml.NewDecoder(srv.Request.Body).Decode(&encryptedXMLMsg); err != nil {
-			return nil, fmt.Errorf("从body中解析xml失败,err=%v", err)
-		}
 
-		//验证消息签名
-		timestamp := srv.Query("timestamp")
-		srv.timestamp, err = strconv.ParseInt(timestamp, 10, 32)
-		if err != nil {
-			return nil, err
-		}
-		nonce := srv.Query("nonce")
-		srv.nonce = nonce
-		msgSignature := srv.Query("msg_signature")
-		msgSignatureGen := util.Signature(srv.Token, timestamp, nonce, encryptedXMLMsg.EncryptedMsg)
-		if msgSignature != msgSignatureGen {
-			return nil, fmt.Errorf("消息不合法，验证签名失败")
-		}
+	var encryptedXMLMsg message.EncryptedXMLMsg
+	if err := xml.NewDecoder(srv.Request.Body).Decode(&encryptedXMLMsg); err != nil {
+		return nil, fmt.Errorf("从body中解析xml失败,err=%v", err)
+	}
 
-		//解密
-		srv.random, rawXMLMsgBytes, err = util.DecryptMsg(srv.CorpID, encryptedXMLMsg.EncryptedMsg, srv.EncodingAESKey)
-		if err != nil {
-			return nil, fmt.Errorf("消息解密失败, err=%v", err)
-		}
-	} else {
-		rawXMLMsgBytes, err = ioutil.ReadAll(srv.Request.Body)
-		if err != nil {
-			return nil, fmt.Errorf("从body中解析xml失败, err=%v", err)
-		}
+	//验证消息签名
+	timestamp := srv.Query("timestamp")
+	srv.timestamp, err = strconv.ParseInt(timestamp, 10, 32)
+	if err != nil {
+		return nil, err
+	}
+	nonce := srv.Query("nonce")
+	srv.nonce = nonce
+	msgSignature := srv.Query("msg_signature")
+	msgSignatureGen := util.Signature(srv.Token, timestamp, nonce, encryptedXMLMsg.EncryptedMsg)
+	if msgSignature != msgSignatureGen {
+		return nil, fmt.Errorf("消息不合法，验证签名失败")
+	}
+
+	//解密
+	srv.random, rawXMLMsgBytes, err = util.DecryptMsg(srv.CorpID, encryptedXMLMsg.EncryptedMsg, srv.EncodingAESKey)
+	if err != nil {
+		return nil, fmt.Errorf("消息解密失败, err=%v", err)
 	}
 
 	srv.RequestRawXMLMsg = rawXMLMsgBytes
@@ -244,24 +205,24 @@ func (srv *Server) buildResponse(reply *message.Reply) (err error) {
 func (srv *Server) Send() (err error) {
 	replyMsg := srv.ResponseMsg
 	log.Debugf("response msg =%+v", replyMsg)
-	if srv.isSafeMode {
-		//安全模式下对消息进行加密
-		var encryptedMsg []byte
-		encryptedMsg, err = util.EncryptMsg(srv.random, srv.ResponseRawXMLMsg, srv.CorpID, srv.EncodingAESKey)
-		if err != nil {
-			return
-		}
-		//TODO 如果获取不到timestamp nonce 则自己生成
-		timestamp := srv.timestamp
-		timestampStr := strconv.FormatInt(timestamp, 10)
-		msgSignature := util.Signature(srv.Token, timestampStr, srv.nonce, string(encryptedMsg))
-		replyMsg = message.ResponseEncryptedXMLMsg{
-			EncryptedMsg: string(encryptedMsg),
-			MsgSignature: msgSignature,
-			Timestamp:    timestamp,
-			Nonce:        srv.nonce,
-		}
+
+	//安全模式下对消息进行加密
+	var encryptedMsg []byte
+	encryptedMsg, err = util.EncryptMsg(srv.random, srv.ResponseRawXMLMsg, srv.CorpID, srv.EncodingAESKey)
+	if err != nil {
+		return
 	}
+	//TODO 如果获取不到timestamp nonce 则自己生成
+	timestamp := srv.timestamp
+	timestampStr := strconv.FormatInt(timestamp, 10)
+	msgSignature := util.Signature(srv.Token, timestampStr, srv.nonce, string(encryptedMsg))
+	replyMsg = message.ResponseEncryptedXMLMsg{
+		EncryptedMsg: string(encryptedMsg),
+		MsgSignature: msgSignature,
+		Timestamp:    timestamp,
+		Nonce:        srv.nonce,
+	}
+
 	if replyMsg != nil {
 		srv.XML(replyMsg)
 	}
