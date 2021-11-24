@@ -64,7 +64,7 @@ func (srv *Server) SkipValidate(skip bool) {
 	srv.skipValidate = skip
 }
 
-//Serve 处理微信的请求消息
+//Serve 处理企业微信的请求消息
 func (srv *Server) Serve() error {
 	response, err := srv.handleRequest()
 	if err != nil {
@@ -88,7 +88,7 @@ func (srv *Server) Validate() bool {
 	return signature == util.Signature(srv.Token, timestamp, nonce)
 }
 
-//HandleRequest 处理微信的请求
+//HandleRequest 处理企业微信的请求
 func (srv *Server) handleRequest() (reply *message.Reply, err error) {
 
 	var msg interface{}
@@ -105,7 +105,7 @@ func (srv *Server) handleRequest() (reply *message.Reply, err error) {
 	return
 }
 
-//getMessage 解析微信返回的消息
+//getMessage 解析企业微信返回的消息
 func (srv *Server) getMessage() (interface{}, error) {
 	var rawXMLMsgBytes []byte
 	var err error
@@ -136,7 +136,6 @@ func (srv *Server) getMessage() (interface{}, error) {
 	}
 
 	srv.RequestRawXMLMsg = rawXMLMsgBytes
-
 	return srv.parseRequestMessage(rawXMLMsgBytes)
 }
 
@@ -167,9 +166,9 @@ func (srv *Server) buildResponse(reply *message.Reply) (err error) {
 	case message.MsgTypeImage:
 	case message.MsgTypeVoice:
 	case message.MsgTypeVideo:
-	case message.MsgTypeMusic:
 	case message.MsgTypeNews:
-	case message.MsgTypeTransfer:
+	case message.MsgTypeUpdateButton:
+	case message.MsgTypeUpdateTemplateCard:
 	default:
 		err = message.ErrUnsupportReply
 		return
@@ -195,7 +194,6 @@ func (srv *Server) buildResponse(reply *message.Reply) (err error) {
 
 	params[0] = reflect.ValueOf(util.GetCurrTS())
 	value.MethodByName("SetCreateTime").Call(params)
-
 	srv.ResponseMsg = msgData
 	srv.ResponseRawXMLMsg, err = xml.Marshal(msgData)
 	return
