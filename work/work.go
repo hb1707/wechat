@@ -4,6 +4,7 @@ import (
 	"github.com/silenceper/wechat/v2/credential"
 	"github.com/silenceper/wechat/v2/work/config"
 	"github.com/silenceper/wechat/v2/work/context"
+	"github.com/silenceper/wechat/v2/work/externalcontact"
 	"github.com/silenceper/wechat/v2/work/kf"
 	"github.com/silenceper/wechat/v2/work/msgaudit"
 	"github.com/silenceper/wechat/v2/work/oauth"
@@ -64,4 +65,9 @@ func (wk *Work) GetUser() *user.User {
 //GetCalendar get calendar
 func (wk *Work) GetCalendar() *tools.Calendar {
 	return tools.NewCalendar(wk.ctx)
+}
+
+//GetExternalContact 客户联系
+func (wk *Work) GetExternalContact() (*externalcontact.Client, error) {
+	return externalcontact.NewClient(wk.ctx.Config)
 }
