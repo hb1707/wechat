@@ -13,7 +13,7 @@ const (
 	userInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=%s&userid=%s"
 	updateURL   = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=%s&department_id=%s&fetch_child=1"
 	userListURL = "https://qyapi.weixin.qq.com/cgi-bin/user/get"
-	launchCode  = "https://qyapi.weixin.qq.com/cgi-bin/get_launch_code"
+	launchCode  = "https://qyapi.weixin.qq.com/cgi-bin/get_launch_code?access_token=%s"
 )
 
 //User 用户管理
@@ -207,7 +207,7 @@ func (user *User) GetLaunchCode(userID, other string) (userInfo *RespLaunchCode,
 		return
 	}
 
-	uri := fmt.Sprintf(launchCode, accessToken, userID)
+	uri := fmt.Sprintf(launchCode, accessToken)
 	var response []byte
 	response, err = util.PostJSON(uri, map[string]interface{}{"operator_userid": userID, "single_chat": map[string]string{"userid": other}})
 	if err != nil {

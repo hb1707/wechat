@@ -5,6 +5,7 @@ import (
 	"github.com/silenceper/wechat/v2/work/config"
 	"github.com/silenceper/wechat/v2/work/context"
 	"github.com/silenceper/wechat/v2/work/externalcontact"
+	"github.com/silenceper/wechat/v2/work/js"
 	"github.com/silenceper/wechat/v2/work/kf"
 	"github.com/silenceper/wechat/v2/work/msgaudit"
 	"github.com/silenceper/wechat/v2/work/oauth"
@@ -45,6 +46,11 @@ func (wk *Work) GetServer(req *http.Request, writer http.ResponseWriter) *server
 //GetOauth get oauth
 func (wk *Work) GetOauth() *oauth.Oauth {
 	return oauth.NewOauth(wk.ctx)
+}
+
+// GetJs js-sdk配置
+func (wk *Work) GetJs() *js.Js {
+	return js.NewJs(wk.ctx)
 }
 
 // GetMsgAudit get msgAudit
