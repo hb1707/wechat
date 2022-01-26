@@ -20,7 +20,7 @@ type ReqGetByUser struct {
 type OneUser struct {
 	util.CommonError
 	ExternalContact ExternalContact `json:"external_contact"`
-	FollowUser      []FollowInfo    `json:"follow_user"` //注意，仅获取单个客户详情的时候这里返回的是跟进记录列表
+	FollowUser      []FollowInfo    `json:"follow_user"` //注意，仅获取单个客户详情的时候这里返回的是跟进人列表
 	NextCursor      string          `json:"next_cursor"`
 }
 type resUserList struct {
@@ -35,7 +35,7 @@ type resUserids struct {
 
 type UserInfo struct {
 	ExternalContact ExternalContact `json:"external_contact"`
-	FollowInfo      FollowInfo      `json:"follow_info"` //企业成员客户跟进信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
+	FollowInfo      FollowInfo      `json:"follow_info"` //企业成员客户跟进人信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
 }
 
 type ExternalContact struct {
@@ -134,7 +134,7 @@ func (tpl *Client) GetQyUserInfoList(qyUserid []string) ([]UserInfo, error) {
 	return userInfoList, nil
 }
 
-//GetUserInfoAndAllFollow 获取客户详情以及全部跟进记录
+//GetUserInfoAndAllFollow 获取客户详情以及全部跟进人
 func (tpl *Client) GetUserInfoAndAllFollow(userid string) (OneUser, error) {
 	var result, res OneUser
 	var err error
