@@ -22,77 +22,77 @@ const (
 	//MsgTypeText 表示文本消息
 	MsgTypeText MsgType = "text"
 	//MsgTypeImage 表示图片消息
-	MsgTypeImage = "image"
+	MsgTypeImage MsgType = "image"
 	//MsgTypeVoice 表示语音消息
-	MsgTypeVoice = "voice"
+	MsgTypeVoice MsgType = "voice"
 	//MsgTypeVideo 表示视频消息
-	MsgTypeVideo = "video"
+	MsgTypeVideo MsgType = "video"
 	//MsgTypeNews 表示图文消息[限回复与发送应用消息]
-	MsgTypeNews = "news"
+	MsgTypeNews MsgType = "news"
 
 	//MsgTypeLink 表示链接消息[限接收]
-	MsgTypeLink = "link"
+	MsgTypeLink MsgType = "link"
 	//MsgTypeLocation 表示坐标消息[限接收]
-	MsgTypeLocation = "location"
+	MsgTypeLocation MsgType = "location"
 
 	//MsgTypeUpdateButton 更新点击用户的按钮文案[限回复应用消息]
-	MsgTypeUpdateButton = "update_button"
+	MsgTypeUpdateButton MsgType = "update_button"
 	//MsgTypeUpdateTemplateCard 更新点击用户的整张卡片[限回复应用消息]
-	MsgTypeUpdateTemplateCard = "update_template_card"
+	MsgTypeUpdateTemplateCard MsgType = "update_template_card"
 
 	//MsgTypeFile 文件消息[限发送应用消息]
-	MsgTypeFile = "file"
+	MsgTypeFile MsgType = "file"
 	//MsgTypeTextCard 文本卡片消息[限发送应用消息]
-	MsgTypeTextCard = "textcard"
+	MsgTypeTextCard MsgType = "textcard"
 	//MsgTypeMpNews 图文消息[限发送应用消息] 跟普通的图文消息一致，唯一的差异是图文内容存储在企业微信
-	MsgTypeMpNews = "mpnews"
+	MsgTypeMpNews MsgType = "mpnews"
 	//MsgTypeMarkdown markdown消息[限发送应用消息]
-	MsgTypeMarkdown = "markdown"
+	MsgTypeMarkdown MsgType = "markdown"
 	//MsgTypeMiniprogramNotice 小程序通知消息[限发送应用消息]
-	MsgTypeMiniprogramNotice = "miniprogram_notice"
+	MsgTypeMiniprogramNotice MsgType = "miniprogram_notice"
 	//MsgTypeTemplateCard 模板卡片消息[限发送应用消息]
-	MsgTypeTemplateCard = "template_card"
+	MsgTypeTemplateCard MsgType = "template_card"
 )
 
 const (
 	//EventSubscribe 成员关注，成员已经加入企业，管理员添加成员到应用可见范围(或移除可见范围)时
 	EventSubscribe EventType = "subscribe"
 	//EventUnsubscribe 成员取消关注，成员已经在应用可见范围，成员加入(或退出)企业时
-	EventUnsubscribe = "unsubscribe"
+	EventUnsubscribe EventType = "unsubscribe"
 	//EventEnterAgent 本事件在成员进入企业微信的应用时触发
-	EventEnterAgent = "enter_agent"
+	EventEnterAgent EventType = "enter_agent"
 	//EventLocation 上报地理位置事件
-	EventLocation = "LOCATION"
+	EventLocation EventType = "LOCATION"
 	//EventBatchJobResult 异步任务完成事件推送
-	EventBatchJobResult = "batch_job_result"
+	EventBatchJobResult EventType = "batch_job_result"
 	//EventClick 点击菜单拉取消息时的事件推送
-	EventClick = "click"
+	EventClick EventType = "click"
 	//EventView 点击菜单跳转链接时的事件推送
-	EventView = "view"
+	EventView EventType = "view"
 	//EventScancodePush 扫码推事件的事件推送
-	EventScancodePush = "scancode_push"
+	EventScancodePush EventType = "scancode_push"
 	//EventScancodeWaitmsg 扫码推事件且弹出“消息接收中”提示框的事件推送
-	EventScancodeWaitmsg = "scancode_waitmsg"
+	EventScancodeWaitmsg EventType = "scancode_waitmsg"
 	//EventPicSysphoto 弹出系统拍照发图的事件推送
-	EventPicSysphoto = "pic_sysphoto"
+	EventPicSysphoto EventType = "pic_sysphoto"
 	//EventPicPhotoOrAlbum 弹出拍照或者相册发图的事件推送
-	EventPicPhotoOrAlbum = "pic_photo_or_album"
+	EventPicPhotoOrAlbum EventType = "pic_photo_or_album"
 	//EventPicWeixin 弹出微信相册发图器的事件推送
-	EventPicWeixin = "pic_weixin"
+	EventPicWeixin EventType = "pic_weixin"
 	//EventLocationSelect 弹出地理位置选择器的事件推送
-	EventLocationSelect = "location_select"
+	EventLocationSelect EventType = "location_select"
 
 	//EventOpenApprovalChange 审批状态通知事件推送
-	EventOpenApprovalChange = "open_approval_change"
+	EventOpenApprovalChange EventType = "open_approval_change"
 
 	//EventShareAgentChange 共享应用事件回调
-	EventShareAgentChange = "share_agent_change"
+	EventShareAgentChange EventType = "share_agent_change"
 
 	//EventTemplateCard 模板卡片事件推送
-	EventTemplateCard = "template_card_event"
+	EventTemplateCard EventType = "template_card_event"
 
 	//EventTemplateCardMenu 通用模板卡片右上角菜单事件推送
-	EventTemplateCardMenu = "template_card_menu_event"
+	EventTemplateCardMenu EventType = "template_card_menu_event"
 
 	//EventChangeExternalContact 企业客户事件推送
 	//add_external_contact 添加
@@ -102,28 +102,28 @@ const (
 	//del_follow_user 客户删除跟进员工
 	//transfer_fail 企业将客户分配给新的成员接替后，客户添加失败
 	//change_external_chat 客户群创建事件
-	EventChangeExternalContact = "change_external_contact"
+	EventChangeExternalContact EventType = "change_external_contact"
 
 	//EventChangeExternalChat 企业客户群变更事件推送
 	//create 客户群创建
 	//update 客户群变更
 	//dismiss 客户群解散
-	EventChangeExternalChat = "change_external_chat"
+	EventChangeExternalChat EventType = "change_external_chat"
 
 	//EventChangeExternalTag 企业客户标签创建事件推送
 	//create 创建标签
 	//update 变更标签
 	//delete 删除标签
 	//shuffle 重新排序
-	EventChangeExternalTag = "change_external_tag"
+	EventChangeExternalTag EventType = "change_external_tag"
 
 	//EventKfMsg 企业微信客服回调事件
-	EventKfMsg = "kf_msg_or_event"
+	EventKfMsg EventType = "kf_msg_or_event"
 	//EventLivingStatusChange 直播回调事件
-	EventLivingStatusChange = "living_status_change"
+	EventLivingStatusChange EventType = "living_status_change"
 
 	//EventMsgauditNotify 会话内容存档开启后，产生会话回调事件
-	EventMsgauditNotify = "msgaudit_notify"
+	EventMsgauditNotify EventType = "msgaudit_notify"
 )
 
 //todo 第三方应用开发

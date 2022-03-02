@@ -7,6 +7,7 @@ import (
 	"github.com/silenceper/wechat/v2/work/externalcontact"
 	"github.com/silenceper/wechat/v2/work/js"
 	"github.com/silenceper/wechat/v2/work/kf"
+	"github.com/silenceper/wechat/v2/work/message"
 	"github.com/silenceper/wechat/v2/work/msgaudit"
 	"github.com/silenceper/wechat/v2/work/oauth"
 	"github.com/silenceper/wechat/v2/work/server"
@@ -76,4 +77,9 @@ func (wk *Work) GetCalendar() *tools.Calendar {
 //GetExternalContact 客户联系
 func (wk *Work) GetExternalContact() (*externalcontact.Client, error) {
 	return externalcontact.NewClient(wk.ctx.Config)
+}
+
+//GetMessageApp 发送应用消息
+func (wk *Work) GetMessageApp() *message.App {
+	return message.NewApp(wk.ctx)
 }
