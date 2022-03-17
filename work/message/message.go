@@ -173,6 +173,19 @@ type MixMessage struct {
 	Event    EventType `xml:"Event"`
 	EventKey string    `xml:"EventKey"`
 
+	//模板卡片事件推送 https://developer.work.weixin.qq.com/document/path/90240#%E6%A8%A1%E6%9D%BF%E5%8D%A1%E7%89%87%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81
+	TaskId        string `xml:"TaskId"`       //与发送模板卡片消息时指定的task_id相同
+	CardType      string `xml:"CardType"`     //通用模板卡片的类型，类型有"text_notice", "news_notice", "button_interaction", "vote_interaction", "multiple_interaction"五种
+	ResponseCode  string `xml:"ResponseCode"` //用于调用更新卡片接口的ResponseCode，24小时内有效，且只能使用一次
+	SelectedItems struct {
+		SelectedItem struct {
+			QuestionKey string   `xml:"QuestionKey"` //问题的key值
+			OptionIds   struct { //对应问题的选项列表
+				OptionId string `xml:"OptionId"`
+			} `xml:"OptionIds"`
+		} `xml:"SelectedItem"`
+	} `xml:"SelectedItems"`
+
 	//仅上报地理位置事件
 	Latitude  string `xml:"Latitude"`  //地理位置纬度
 	Longitude string `xml:"Longitude"` //地理位置经度
