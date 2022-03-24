@@ -71,7 +71,7 @@ type resTemplateSend struct {
 }
 
 //Send 发送应用消息
-func (tpl *App) Send(msg *AppMessage) (msgID string, err error) {
+func (tpl *App) Send(msg *AppMessage) (msgID string, responseCode string, err error) {
 	var accessToken string
 	accessToken, err = tpl.GetAccessToken()
 	if err != nil {
@@ -96,6 +96,7 @@ func (tpl *App) Send(msg *AppMessage) (msgID string, err error) {
 		return
 	}
 	msgID = result.MsgID
+	responseCode = result.ResponseCode
 	return
 }
 
