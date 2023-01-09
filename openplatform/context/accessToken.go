@@ -1,4 +1,4 @@
-//Package context 开放平台相关context
+// Package context 开放平台相关context
 package context
 
 import (
@@ -18,14 +18,15 @@ const (
 	getComponentInfoURL     = "https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token=%s"
 	componentLoginURL       = "https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=%s&pre_auth_code=%s&redirect_uri=%s&auth_type=%d&biz_appid=%s"
 	bindComponentURL        = "https://mp.weixin.qq.com/safe/bindcomponent?action=bindcomponent&auth_type=%d&no_scan=1&component_appid=%s&pre_auth_code=%s&redirect_uri=%s&biz_appid=%s#wechat_redirect"
-	//TODO 获取授权方选项信息
-	//getComponentConfigURL = "https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_option?component_access_token=%s"
-	//TODO 获取已授权的账号信息
-	//getuthorizerListURL = "POST https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_list?component_access_token=%s"
+	// TODO 获取授权方选项信息
+	// getComponentConfigURL = "https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_option?component_access_token=%s"
+	// TODO 获取已授权的账号信息
+	// getuthorizerListURL = "POST https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_list?component_access_token=%s"
 )
 
 // ComponentAccessToken 第三方平台
 type ComponentAccessToken struct {
+	util.CommonError
 	AccessToken string `json:"component_access_token"`
 	ExpiresIn   int64  `json:"expires_in"`
 }
@@ -55,6 +56,10 @@ func (ctx *Context) SetComponentAccessToken(verifyTicket string) (*ComponentAcce
 	at := &ComponentAccessToken{}
 	if err := json.Unmarshal(respBody, at); err != nil {
 		return nil, err
+	}
+
+	if at.ErrCode != 0 {
+		return nil, fmt.Errorf("SetComponentAccessToken Error , errcode=%d , errmsg=%s", at.ErrCode, at.ErrMsg)
 	}
 
 	accessTokenCacheKey := fmt.Sprintf("component_access_token_%s", ctx.AppID)
@@ -221,6 +226,36 @@ type AuthorizerInfo struct {
 	}
 	Alias     string `json:"alias"`
 	QrcodeURL string `json:"qrcode_url"`
+
+	MiniProgramInfo *MiniProgramInfo       `json:"MiniProgramInfo"`
+	RegisterType    int                    `json:"register_type"`
+	AccountStatus   int                    `json:"account_status"`
+	BasicConfig     *AuthorizerBasicConfig `json:"basic_config"`
+}
+
+// AuthorizerBasicConfig 授权账号的基础配置结构体
+type AuthorizerBasicConfig struct {
+	IsPhoneConfigured bool `json:"isPhoneConfigured"`
+	IsEmailConfigured bool `json:"isEmailConfigured"`
+}
+
+// MiniProgramInfo 授权账号小程序配置 授权账号为小程序时存在
+type MiniProgramInfo struct {
+	Network struct {
+		RequestDomain   []string `json:"RequestDomain"`
+		WsRequestDomain []string `json:"WsRequestDomain"`
+		UploadDomain    []string `json:"UploadDomain"`
+		DownloadDomain  []string `json:"DownloadDomain"`
+		BizDomain       []string `json:"BizDomain"`
+		UDPDomain       []string `json:"UDPDomain"`
+	} `json:"network"`
+	Categories []CategoriesInfo `json:"categories"`
+}
+
+// CategoriesInfo 授权账号小程序配置的类目信息
+type CategoriesInfo struct {
+	First  string `wx:"first"`
+	Second string `wx:"second"`
 }
 
 // GetAuthrInfo 获取授权方的帐号基本信息

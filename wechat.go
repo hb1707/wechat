@@ -3,6 +3,8 @@ package wechat
 import (
 	"os"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/silenceper/wechat/v2/cache"
 	"github.com/silenceper/wechat/v2/miniprogram"
 	miniConfig "github.com/silenceper/wechat/v2/miniprogram/config"
@@ -14,7 +16,6 @@ import (
 	payConfig "github.com/silenceper/wechat/v2/pay/config"
 	"github.com/silenceper/wechat/v2/work"
 	workConfig "github.com/silenceper/wechat/v2/work/config"
-	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -39,12 +40,12 @@ func NewWechat() *Wechat {
 	return &Wechat{}
 }
 
-//SetCache 设置cache
-func (wc *Wechat) SetCache(cahce cache.Cache) {
-	wc.cache = cahce
+// SetCache 设置cache
+func (wc *Wechat) SetCache(cache cache.Cache) {
+	wc.cache = cache
 }
 
-//GetOfficialAccount 获取微信公众号实例
+// GetOfficialAccount 获取微信公众号实例
 func (wc *Wechat) GetOfficialAccount(cfg *offConfig.Config) *officialaccount.OfficialAccount {
 	if cfg.Cache == nil {
 		cfg.Cache = wc.cache

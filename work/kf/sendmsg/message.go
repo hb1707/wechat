@@ -2,9 +2,9 @@ package sendmsg
 
 // Message 发送消息
 type Message struct {
-	ToUser   string `json:"touser"`    // 指定接收消息的客户UserID
-	OpenKFID string `json:"open_kfid"` // 指定发送消息的客服帐号ID
-	MsgID    string `json:"msgid"`     // 指定消息ID
+	ToUser   string `json:"touser"`          // 指定接收消息的客户UserID
+	OpenKFID string `json:"open_kfid"`       // 指定发送消息的客服帐号ID
+	MsgID    string `json:"msgid,omitempty"` // 指定消息ID
 }
 
 // Text 发送文本消息
@@ -82,7 +82,8 @@ type Menu struct {
 	MsgType string `json:"msgtype"` // 消息类型，此时固定为：msgmenu
 	MsgMenu struct {
 		HeadContent string        `json:"head_content"` // 消息内容，不多于1024字节
-		List        []interface{} `json:"list"`         // 菜单项配置
+		List        []interface{} `json:"list"`         // 菜单项配置，不能多余10个
+		TailContent string        `json:"tail_content"` // 结束文本, 不多于1024字
 	} `json:"msgmenu"`
 }
 

@@ -9,76 +9,84 @@ import (
 	"github.com/silenceper/wechat/v2/work/context"
 )
 
-//Oauth auth
+// Oauth auth
 type Oauth struct {
 	*context.Context
 }
 
 var (
-	//oauthTargetURL 企业微信内跳转地址
+	// oauthTargetURL 企业微信内跳转地址
 	oauthTargetURL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect"
-	//oauthUserInfoURL 获取用户信息地址
+	// oauthTargetURL 企业微信内跳转地址(获取成员的详细信息)
+	oauthTargetPrivateURL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_privateinfo&agentid=%s&state=STATE#wechat_redirect"
+	// oauthUserInfoURL 获取用户信息地址
 	oauthUserInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=%s&code=%s"
-	//oauthQrContentTargetURL 构造独立窗口登录二维码
+	// oauthQrContentTargetURL 构造独立窗口登录二维码
 	oauthQrContentTargetURL = "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=%s&agentid=%s&redirect_uri=%s&state=%s"
 	//code2Session 获取用户信息地址
 	code2SessionURL = "https://qyapi.weixin.qq.com/cgi-bin/miniprogram/jscode2session?access_token=%s&js_code=%s&grant_type=authorization_code"
 )
 
-//NewOauth new init oauth
+// NewOauth new init oauth
 func NewOauth(ctx *context.Context) *Oauth {
 	return &Oauth{
 		ctx,
 	}
 }
 
-//GetTargetURL 获取授权地址
+// GetTargetURL 获取授权地址
 func (ctr *Oauth) GetTargetURL(callbackURL string) string {
-	//url encode
-	urlStr := url.QueryEscape(callbackURL)
+	// url encode
 	return fmt.Sprintf(
 		oauthTargetURL,
 		ctr.CorpID,
-		urlStr,
+		url.QueryEscape(callbackURL),
 	)
 }
 
-//GetQrContentTargetURL 构造独立窗口登录二维码
+// GetTargetPrivateURL 获取个人信息授权地址
+func (ctr *Oauth) GetTargetPrivateURL(callbackURL string, agentID string) string {
+	// url encode
+	return fmt.Sprintf(
+		oauthTargetPrivateURL,
+		ctr.CorpID,
+		url.QueryEscape(callbackURL),
+		agentID,
+	)
+}
+
+// GetQrContentTargetURL 构造独立窗口登录二维码
 func (ctr *Oauth) GetQrContentTargetURL(callbackURL string) string {
-	//url encode
-	urlStr := url.QueryEscape(callbackURL)
+	// url encode
 	return fmt.Sprintf(
 		oauthQrContentTargetURL,
 		ctr.CorpID,
 		ctr.AgentID,
-		urlStr,
+		url.QueryEscape(callbackURL),
 		util.RandomStr(16),
 	)
 }
 
-//ResUserInfo 返回得用户信息
+// ResUserInfo 返回得用户信息
 type ResUserInfo struct {
 	util.CommonError
-	//当用户为企业成员时返回
+	// 当用户为企业成员时返回
 	UserID   string `json:"UserId"`
 	DeviceID string `json:"DeviceId"`
-	//非企业成员授权时返回
-	OpenID string `json:"OpenId"`
+	// 非企业成员授权时返回
+	OpenID         string `json:"OpenId"`
+	ExternalUserID string `json:"external_userid"`
 	UserTicket string `json:"user_ticket"`
 }
 
-//UserFromCode 根据code获取用户信息
+// UserFromCode 根据code获取用户信息
 func (ctr *Oauth) UserFromCode(code string) (result ResUserInfo, err error) {
 	var accessToken string
-	accessToken, err = ctr.GetAccessToken()
-	if err != nil {
+	if accessToken, err = ctr.GetAccessToken(); err != nil {
 		return
 	}
 	var response []byte
-	response, err = util.HTTPGet(
-		fmt.Sprintf(oauthUserInfoURL, accessToken, code),
-	)
-	if err != nil {
+	if response, err = util.HTTPGet(fmt.Sprintf(oauthUserInfoURL, accessToken, code)); err != nil {
 		return
 	}
 	err = json.Unmarshal(response, &result)
