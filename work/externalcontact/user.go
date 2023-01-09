@@ -10,6 +10,7 @@ const (
 	listUrl           = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list"
 	getUrl            = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get"
 	getByUserBatchUrl = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user"
+	markTag           = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/mark_tag"
 )
 
 type ReqGetByUser struct {
@@ -87,7 +88,14 @@ type FollowInfo struct {
 	State          string   `json:"state,omitempty"`
 }
 
-//GetUseridList 获取我的客户列表
+type MarkTag struct {
+	Userid         string   `json:"userid"`
+	ExternalUserid string   `json:"external_userid"`
+	AddTag         []string `json:"add_tag"`
+	RemoveTag      []string `json:"remove_tag"`
+}
+
+// GetUseridList 获取我的客户列表
 func (tpl *Client) GetUseridList(myUserid string) (externalUserid []string, err error) {
 	var accessToken string
 	accessToken, err = tpl.ctx.GetAccessToken()
@@ -113,7 +121,7 @@ func (tpl *Client) GetUseridList(myUserid string) (externalUserid []string, err 
 	return
 }
 
-//GetUseridList 获取我的全部客户列表及详情
+// GetQyUserInfoList 获取我的全部客户列表及详情
 func (tpl *Client) GetQyUserInfoList(qyUserid []string) ([]UserInfo, error) {
 	var userInfoList []UserInfo
 	var req ReqGetByUser
@@ -134,7 +142,7 @@ func (tpl *Client) GetQyUserInfoList(qyUserid []string) ([]UserInfo, error) {
 	return userInfoList, nil
 }
 
-//GetUserInfoAndAllFollow 获取客户详情以及全部跟进人
+// GetUserInfoAndAllFollow 获取客户详情以及全部跟进人
 func (tpl *Client) GetUserInfoAndAllFollow(userid string) (OneUser, error) {
 	var result, res OneUser
 	var err error
@@ -155,7 +163,7 @@ func (tpl *Client) GetUserInfoAndAllFollow(userid string) (OneUser, error) {
 	return result, nil
 }
 
-//GetUserInfo 获取客户详情
+// GetUserInfo 获取客户详情
 func (tpl *Client) GetUserInfo(externalUserid string, cursor ...string) (result OneUser, err error) {
 	var accessToken string
 	accessToken, err = tpl.ctx.GetAccessToken()
@@ -183,7 +191,7 @@ func (tpl *Client) GetUserInfo(externalUserid string, cursor ...string) (result 
 	return
 }
 
-//GetUserInfoListByUserId 批量获取客户详情
+// GetUserInfoListByUserIds 批量获取客户详情
 func (tpl *Client) GetUserInfoListByUserIds(req ReqGetByUser) (userList []UserInfo, nextCursor string, err error) {
 	var accessToken string
 	accessToken, err = tpl.ctx.GetAccessToken()
@@ -207,5 +215,30 @@ func (tpl *Client) GetUserInfoListByUserIds(req ReqGetByUser) (userList []UserIn
 	}
 	userList = result.ExternalContactList
 	nextCursor = result.NextCursor
+	return
+}
+
+// EditUserTags 编辑客户企业标签
+func (tpl *Client) EditUserTags(req *MarkTag) (result util.CommonError, err error) {
+	var accessToken string
+	accessToken, err = tpl.ctx.GetAccessToken()
+	if err != nil {
+		return
+	}
+
+	uri := fmt.Sprintf("%s?access_token=%s", markTag, accessToken)
+	var response []byte
+	response, err = util.PostJSON(uri, req)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		return
+	}
+	if result.ErrCode != 0 {
+		err = fmt.Errorf("template msg send error : errcode=%v , errmsg=%v", result.ErrCode, result.ErrMsg)
+		return
+	}
 	return
 }
