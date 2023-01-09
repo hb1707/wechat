@@ -148,35 +148,36 @@ type MixMessage struct {
 	MsgID   int64 `xml:"MsgId"`   //其他消息推送过来是MsgId
 	AgentID int   `xml:"AgentID"` //企业应用的id，整型。可在应用的设置页面查看
 
-	Content      string `xml:"Content"`      //文本消息内容
-	Format       string `xml:"Format"`       //语音消息格式，如amr，speex等
-	ThumbMediaID string `xml:"ThumbMediaId"` //视频消息缩略图的媒体id，可以调用获取媒体文件接口拉取数据，仅三天内有效
+	Content      string `xml:"Content,omitempty"`      //文本消息内容
+	Format       string `xml:"Format,omitempty"`       //语音消息格式，如amr，speex等
+	ThumbMediaID string `xml:"ThumbMediaId,omitempty"` //视频消息缩略图的媒体id，可以调用获取媒体文件接口拉取数据，仅三天内有效
 
-	Title       string `xml:"Title"`       //链接消息，标题
-	Description string `xml:"Description"` //链接消息，描述
-	URL         string `xml:"Url"`         //链接消息，链接跳转的url
+	Title       string `xml:"Title,omitempty"`       //链接消息，标题
+	Description string `xml:"Description,omitempty"` //链接消息，描述
+	URL         string `xml:"Url,omitempty"`         //链接消息，链接跳转的url
 
-	PicURL  string `xml:"PicUrl"`  ////图片消息或者链接消息，封面缩略图的url
-	MediaID string `xml:"MediaId"` //图片媒体文件id//语音媒体文件id//视频消息缩略图的媒体id，可以调用获取媒体文件接口拉取，仅三天内有效
+	PicURL  string `xml:"PicUrl,omitempty"`  ////图片消息或者链接消息，封面缩略图的url
+	MediaID string `xml:"MediaId,omitempty"` //图片媒体文件id//语音媒体文件id//视频消息缩略图的媒体id，可以调用获取媒体文件接口拉取，仅三天内有效
 
-	LocationX float64 `xml:"Location_X"` //位置消息，地理位置纬度
-	LocationY float64 `xml:"Location_Y"` //位置消息，地理位置经度
-	Scale     float64 `xml:"Scale"`      //位置消息，地图缩放大小
-	Label     string  `xml:"Label"`      //位置消息，地理位置信息
+	LocationX float64 `xml:"Location_X,omitempty"` //位置消息，地理位置纬度
+	LocationY float64 `xml:"Location_Y,omitempty"` //位置消息，地理位置经度
+	Scale     float64 `xml:"Scale,omitempty"`      //位置消息，地图缩放大小
+	Label     string  `xml:"Label,omitempty"`      //位置消息，地理位置信息
 
-	AppType string `xml:"AppType"` //接收地理位置时存在，app类型，在企业微信固定返回wxwork，在微信不返回该字段
+	AppType string `xml:"AppType,omitempty"` //接收地理位置时存在，app类型，在企业微信固定返回wxwork，在微信不返回该字段
 
 	//TemplateMsgID int64   `xml:"MsgID"` //模板消息推送成功的消息是MsgID
 	///Recognition   string  `xml:"Recognition"`
 
 	//事件相关
-	Event    EventType `xml:"Event"`
-	EventKey string    `xml:"EventKey"`
+	Event      EventType `xml:"Event,omitempty"`
+	EventKey   string    `xml:"EventKey,omitempty"`
+	ChangeType string    `xml:"ChangeType,omitempty"`
 
 	//模板卡片事件推送 https://developer.work.weixin.qq.com/document/path/90240#%E6%A8%A1%E6%9D%BF%E5%8D%A1%E7%89%87%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81
-	TaskId        string `xml:"TaskId"`       //与发送模板卡片消息时指定的task_id相同
-	CardType      string `xml:"CardType"`     //通用模板卡片的类型，类型有"text_notice", "news_notice", "button_interaction", "vote_interaction", "multiple_interaction"五种
-	ResponseCode  string `xml:"ResponseCode"` //用于调用更新卡片接口的ResponseCode，24小时内有效，且只能使用一次
+	TaskId        string `xml:"TaskId,omitempty"`       //与发送模板卡片消息时指定的task_id相同
+	CardType      string `xml:"CardType,omitempty"`     //通用模板卡片的类型，类型有"text_notice", "news_notice", "button_interaction", "vote_interaction", "multiple_interaction"五种
+	ResponseCode  string `xml:"ResponseCode,omitempty"` //用于调用更新卡片接口的ResponseCode，24小时内有效，且只能使用一次
 	SelectedItems struct {
 		SelectedItem struct {
 			QuestionKey string   `xml:"QuestionKey"` //问题的key值
@@ -184,20 +185,25 @@ type MixMessage struct {
 				OptionId string `xml:"OptionId"`
 			} `xml:"OptionIds"`
 		} `xml:"SelectedItem"`
-	} `xml:"SelectedItems"`
+	} `xml:"SelectedItems,omitempty"`
 
 	//仅上报地理位置事件
-	Latitude  string `xml:"Latitude"`  //地理位置纬度
-	Longitude string `xml:"Longitude"` //地理位置经度
-	Precision string `xml:"Precision"` //地理位置精度
+	Latitude  string `xml:"Latitude,omitempty"`  //地理位置纬度
+	Longitude string `xml:"Longitude,omitempty"` //地理位置经度
+	Precision string `xml:"Precision,omitempty"` //地理位置精度
 
 	//仅异步任务完成事件
-	JobId   string `xml:"JobId"`   //异步任务id，最大长度为64字符
-	JobType string `xml:"JobType"` //异步任务，操作类型，字符串，目前分别有：sync_user(增量更新成员)、 replace_user(全量覆盖成员）、invite_user(邀请成员关注）、replace_party(全量覆盖部门)
-	ErrCode int    `xml:"ErrCode"` //异步任务，返回码
-	ErrMsg  string `xml:"ErrMsg"`  //异步任务，对返回码的文本描述内容
+	JobId   string `xml:"JobId,omitempty"`   //异步任务id，最大长度为64字符
+	JobType string `xml:"JobType,omitempty"` //异步任务，操作类型，字符串，目前分别有：sync_user(增量更新成员)、 replace_user(全量覆盖成员）、invite_user(邀请成员关注）、replace_party(全量覆盖部门)
+	ErrCode int    `xml:"ErrCode,omitempty"` //异步任务，返回码
+	ErrMsg  string `xml:"ErrMsg,omitempty"`  //异步任务，对返回码的文本描述内容
 
 	//开启通讯录回调通知 https://open.work.weixin.qq.com/api/doc/90000/90135/90967
+	UserID         string `xml:"UserID,omitempty"`         //用户userid
+	ExternalUserID string `xml:"ExternalUserID,omitempty"` //外部联系人userid
+	State          string `xml:"State,omitempty"`          //添加此用户的「联系我」方式配置的state参数，可用于识别添加此用户的渠道
+	WelcomeCode    string `xml:"WelcomeCode,omitempty"`    //欢迎码，当state为1时，该值有效
+	Source         string `xml:"Source,omitempty"`         //删除客户的操作来源，DELETE_BY_TRANSFER表示此客户是因在职继承自动被转接成员删除
 
 	// todo 第三方平台相关 字段名可能不准确
 	/*InfoType                     InfoType `xml:"InfoType"`
