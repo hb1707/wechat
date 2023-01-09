@@ -17,7 +17,7 @@ const (
 	ChatTypeGroup  ChatType = "group"
 )
 
-//ReqMessage 企业群发参数
+// ReqMessage 企业群发参数
 type ReqMessage struct {
 	ChatType       ChatType `json:"chat_type"`       //群发任务的类型，默认为single，表示发送给客户，group表示发送给客户群
 	ExternalUserid []string `json:"external_userid"` // 客户的外部联系人id列表，仅在chat_type为single时有效，不可与sender同时为空，最多可传入1万个客户
@@ -63,10 +63,10 @@ type resTemplateSend struct {
 	MsgID    int64  `json:"msgid"`
 }
 
-//Send 发送应用消息
-func (tpl *Client) Send(msg *ReqMessage) (msgID int64, err error) {
+// Send 发送应用消息
+func (r *Client) Send(msg *ReqMessage) (msgID int64, err error) {
 	var accessToken string
-	accessToken, err = tpl.ctx.GetAccessToken()
+	accessToken, err = r.GetAccessToken()
 	if err != nil {
 		return
 	}

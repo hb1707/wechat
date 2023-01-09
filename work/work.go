@@ -78,8 +78,8 @@ func (wk *Work) GetCalendar() *tools.Calendar {
 }
 
 // GetExternalContact 客户联系
-func (wk *Work) GetExternalContact() (*externalcontact.Client, error) {
-	return externalcontact.NewClient(wk.ctx.Config)
+func (wk *Work) GetExternalContact() *externalcontact.Client {
+	return externalcontact.NewClient(wk.ctx)
 }
 
 // GetMessageApp 发送应用消息
