@@ -83,8 +83,8 @@ func (wk *Work) GetExternalContact() *externalcontact.Client {
 }
 
 // GetMessageApp 发送应用消息
-func (wk *Work) GetMessageApp() *message.App {
-	return message.NewApp(wk.ctx)
+func (wk *Work) GetMessageApp() *message.Client {
+	return message.NewClient(wk.ctx)
 }
 
 // GetAddressList get address_list

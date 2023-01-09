@@ -14,19 +14,19 @@ const (
 	messageDelURL                = "https://api.weixin.qq.com/cgi-bin/message/recall"
 )
 
-//App 应用消息
-type App struct {
+// Client 应用消息
+type Client struct {
 	*context.Context
 }
 
-//NewApp 实例化
-func NewApp(context *context.Context) *App {
-	tpl := new(App)
-	tpl.Context = context
-	return tpl
+// NewClient 实例化
+func NewClient(ctx *context.Context) *Client {
+	return &Client{
+		ctx,
+	}
 }
 
-//AppMessage 发送的模板消息内容
+// AppMessage 发送的模板消息内容
 type AppMessage struct {
 	ToUser                 string  `json:"touser"`  // 必须, 成员ID列表（多个接收者用‘|’分隔，最多支持1000个 ,指定为”@all”，则向该企业应用的全部成员发送
 	Toparty                string  `json:"toparty"` //部门ID列表,当touser为”@all”时忽略本参数
@@ -70,8 +70,8 @@ type resTemplateSend struct {
 	ResponseCode string `json:"response_code"` //仅消息类型为“按钮交互型”，“投票选择型”和“多项选择型”的模板卡片消息返回，应用可使用response_code调用更新模版卡片消息接口，24小时内有效，且只能使用一次
 }
 
-//Send 发送应用消息
-func (tpl *App) Send(msg *AppMessage) (msgID string, responseCode string, err error) {
+// Send 发送应用消息
+func (tpl *Client) Send(msg *AppMessage) (msgID string, responseCode string, err error) {
 	var accessToken string
 	accessToken, err = tpl.GetAccessToken()
 	if err != nil {
@@ -100,7 +100,7 @@ func (tpl *App) Send(msg *AppMessage) (msgID string, responseCode string, err er
 	return
 }
 
-//TemplateUpdate  更新模版卡片消息内容
+// TemplateUpdate  更新模版卡片消息内容
 type TemplateUpdate struct {
 	Userids      []string `json:"userids"`
 	Partyids     []int    `json:"partyids"`
@@ -112,8 +112,8 @@ type TemplateUpdate struct {
 	*TemplateCard
 }
 
-//UpdateTemplate 更新模版卡片消息
-func (tpl *App) UpdateTemplate(msg *TemplateUpdate) (msgID string, err error) {
+// UpdateTemplate 更新模版卡片消息
+func (tpl *Client) UpdateTemplate(msg *TemplateUpdate) (msgID string, err error) {
 	var accessToken string
 	accessToken, err = tpl.GetAccessToken()
 	if err != nil {
@@ -142,8 +142,8 @@ type ReqRecall struct {
 	MsgID int64 `json:"msgid"`
 }
 
-//Recall 撤回应用消息
-func (tpl *App) Recall(msgID int64) (err error) {
+// Recall 撤回应用消息
+func (tpl *Client) Recall(msgID int64) (err error) {
 	var accessToken string
 	accessToken, err = tpl.GetAccessToken()
 	if err != nil {
