@@ -46,7 +46,7 @@ type AppMessage struct {
 	News                   *News         `json:"news"`
 	MpNews                 *MpNews       `json:"mpnews"`
 	Markdown               *Text         `json:"markdown"`
-	//todo(hb1707) 可能会发生变化的字段直接用interface{}了
+	//todo(wind) 可能会发生变化的字段直接用interface{}了
 	MiniprogramNotice interface{} `json:"miniprogram_notice"`
 	TemplateCard      interface{} `json:"template_card"`
 }
@@ -71,16 +71,16 @@ type resTemplateSend struct {
 }
 
 // Send 发送应用消息
-func (tpl *Client) Send(msg *AppMessage) (msgID string, responseCode string, err error) {
+func (r *Client) Send(msg *AppMessage) (msgID string, responseCode string, err error) {
 	var accessToken string
-	accessToken, err = tpl.GetAccessToken()
+	accessToken, err = r.GetAccessToken()
 	if err != nil {
 		return
 	}
 	uri := fmt.Sprintf("%s?access_token=%s", messageSendURL, accessToken)
 	var response []byte
 	if msg.Agentid == 0 {
-		msg.Agentid, _ = strconv.Atoi(tpl.Context.AgentID)
+		msg.Agentid, _ = strconv.Atoi(r.Context.AgentID)
 	}
 	response, err = util.PostJSON(uri, msg)
 	if err != nil {
@@ -113,9 +113,9 @@ type TemplateUpdate struct {
 }
 
 // UpdateTemplate 更新模版卡片消息
-func (tpl *Client) UpdateTemplate(msg *TemplateUpdate) (msgID string, err error) {
+func (r *Client) UpdateTemplate(msg *TemplateUpdate) (msgID string, err error) {
 	var accessToken string
-	accessToken, err = tpl.GetAccessToken()
+	accessToken, err = r.GetAccessToken()
 	if err != nil {
 		return
 	}
@@ -143,9 +143,9 @@ type ReqRecall struct {
 }
 
 // Recall 撤回应用消息
-func (tpl *Client) Recall(msgID int64) (err error) {
+func (r *Client) Recall(msgID int64) (err error) {
 	var accessToken string
-	accessToken, err = tpl.GetAccessToken()
+	accessToken, err = r.GetAccessToken()
 	if err != nil {
 		return
 	}
