@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	//添加客服账号
+	// 添加客服账号
 	accountAddAddr = "https://qyapi.weixin.qq.com/cgi-bin/kf/account/add?access_token=%s"
 	// 删除客服账号
 	accountDelAddr = "https://qyapi.weixin.qq.com/cgi-bin/kf/account/del?access_token=%s"
@@ -16,7 +16,7 @@ const (
 	accountUpdateAddr = "https://qyapi.weixin.qq.com/cgi-bin/kf/account/update?access_token=%s"
 	// 获取客服账号列表
 	accountListAddr = "https://qyapi.weixin.qq.com/cgi-bin/kf/account/list?access_token=%s"
-	//获取客服账号链接
+	// 获取客服账号链接
 	addContactWayAddr = "https://qyapi.weixin.qq.com/cgi-bin/kf/add_contact_way?access_token=%s"
 )
 
@@ -38,12 +38,10 @@ func (r *Client) AccountAdd(options AccountAddOptions) (info AccountAddSchema, e
 		accessToken string
 		data        []byte
 	)
-	accessToken, err = r.ctx.GetAccessToken()
-	if err != nil {
+	if accessToken, err = r.ctx.GetAccessToken(); err != nil {
 		return
 	}
-	data, err = util.PostJSON(fmt.Sprintf(accountAddAddr, accessToken), options)
-	if err != nil {
+	if data, err = util.PostJSON(fmt.Sprintf(accountAddAddr, accessToken), options); err != nil {
 		return
 	}
 	if err = json.Unmarshal(data, &info); err != nil {
@@ -66,12 +64,10 @@ func (r *Client) AccountDel(options AccountDelOptions) (info util.CommonError, e
 		accessToken string
 		data        []byte
 	)
-	accessToken, err = r.ctx.GetAccessToken()
-	if err != nil {
+	if accessToken, err = r.ctx.GetAccessToken(); err != nil {
 		return
 	}
-	data, err = util.PostJSON(fmt.Sprintf(accountDelAddr, accessToken), options)
-	if err != nil {
+	if data, err = util.PostJSON(fmt.Sprintf(accountDelAddr, accessToken), options); err != nil {
 		return
 	}
 	if err = json.Unmarshal(data, &info); err != nil {
@@ -96,12 +92,10 @@ func (r *Client) AccountUpdate(options AccountUpdateOptions) (info util.CommonEr
 		accessToken string
 		data        []byte
 	)
-	accessToken, err = r.ctx.GetAccessToken()
-	if err != nil {
+	if accessToken, err = r.ctx.GetAccessToken(); err != nil {
 		return
 	}
-	data, err = util.PostJSON(fmt.Sprintf(accountUpdateAddr, accessToken), options)
-	if err != nil {
+	if data, err = util.PostJSON(fmt.Sprintf(accountUpdateAddr, accessToken), options); err != nil {
 		return
 	}
 	if err = json.Unmarshal(data, &info); err != nil {
@@ -132,12 +126,10 @@ func (r *Client) AccountList() (info AccountListSchema, err error) {
 		accessToken string
 		data        []byte
 	)
-	accessToken, err = r.ctx.GetAccessToken()
-	if err != nil {
+	if accessToken, err = r.ctx.GetAccessToken(); err != nil {
 		return
 	}
-	data, err = util.HTTPGet(fmt.Sprintf(accountListAddr, accessToken))
-	if err != nil {
+	if data, err = util.HTTPGet(fmt.Sprintf(accountListAddr, accessToken)); err != nil {
 		return
 	}
 	if err = json.Unmarshal(data, &info); err != nil {
@@ -171,12 +163,10 @@ func (r *Client) AddContactWay(options AddContactWayOptions) (info AddContactWay
 		accessToken string
 		data        []byte
 	)
-	accessToken, err = r.ctx.GetAccessToken()
-	if err != nil {
+	if accessToken, err = r.ctx.GetAccessToken(); err != nil {
 		return
 	}
-	data, err = util.PostJSON(fmt.Sprintf(addContactWayAddr, accessToken), options)
-	if err != nil {
+	if data, err = util.PostJSON(fmt.Sprintf(addContactWayAddr, accessToken), options); err != nil {
 		return
 	}
 	if err = json.Unmarshal(data, &info); err != nil {
