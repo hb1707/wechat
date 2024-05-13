@@ -23,8 +23,10 @@ var (
 	oauthUserInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=%s&code=%s"
 	// oauthQrContentTargetURL 构造独立窗口登录二维码
 	oauthQrContentTargetURL = "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=%s&agentid=%s&redirect_uri=%s&state=%s"
-	//code2Session 获取用户信息地址
-	code2SessionURL = "https://qyapi.weixin.qq.com/cgi-bin/miniprogram/jscode2session?access_token=%s&js_code=%s&grant_type=authorization_code"
+	// getUserInfoURL 获取访问用户身份&获取用户登录身份
+	getUserInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo?access_token=%s&code=%s"
+	// getUserDetailURL 获取访问用户敏感信息
+	getUserDetailURL = "https://qyapi.weixin.qq.com/cgi-bin/auth/getuserdetail?access_token=%s"
 )
 
 // NewOauth new init oauth
@@ -76,7 +78,6 @@ type ResUserInfo struct {
 	// 非企业成员授权时返回
 	OpenID         string `json:"OpenId"`
 	ExternalUserID string `json:"external_userid"`
-	UserTicket string `json:"user_ticket"`
 }
 
 // UserFromCode 根据code获取用户信息
@@ -97,23 +98,68 @@ func (ctr *Oauth) UserFromCode(code string) (result ResUserInfo, err error) {
 	return
 }
 
-func (ctr *Oauth) Code2Session(code string) (result ResUserInfo, err error) {
-	var accessToken string
-	accessToken, err = ctr.GetAccessToken()
-	if err != nil {
-		return
+// GetUserInfoResponse 获取访问用户身份&获取用户登录身份响应
+type GetUserInfoResponse struct {
+	util.CommonError
+	UserID         string `json:"userid"`
+	UserTicket     string `json:"user_ticket"`
+	OpenID         string `json:"openid"`
+	ExternalUserID string `json:"external_userid"`
+}
+
+// GetUserInfo 获取访问用户身份&获取用户登录身份
+// @see https://developer.work.weixin.qq.com/document/path/90213 获取访问用户身份
+// @see https://developer.work.weixin.qq.com/document/path/98176 获取用户登录身份
+func (ctr *Oauth) GetUserInfo(code string) (*GetUserInfoResponse, error) {
+	var (
+		accessToken string
+		err         error
+	)
+	if accessToken, err = ctr.GetAccessToken(); err != nil {
+		return nil, err
 	}
 	var response []byte
-	response, err = util.HTTPGet(
-		fmt.Sprintf(code2SessionURL, accessToken, code),
+	if response, err = util.HTTPGet(fmt.Sprintf(getUserInfoURL, accessToken, code)); err != nil {
+		return nil, err
+	}
+	result := &GetUserInfoResponse{}
+	err = util.DecodeWithError(response, result, "GetUserInfo")
+	return result, err
+}
+
+// GetUserDetailRequest 获取访问用户敏感信息请求
+type GetUserDetailRequest struct {
+	UserTicket string `json:"user_ticket"`
+}
+
+// GetUserDetailResponse 获取访问用户敏感信息响应
+type GetUserDetailResponse struct {
+	util.CommonError
+	UserID  string `json:"userid"`
+	Gender  string `json:"gender"`
+	Avatar  string `json:"avatar"`
+	QrCode  string `json:"qr_code"`
+	Mobile  string `json:"mobile"`
+	Email   string `json:"email"`
+	BizMail string `json:"biz_mail"`
+	Address string `json:"address"`
+}
+
+// GetUserDetail 获取访问用户敏感信息
+// @see https://developer.work.weixin.qq.com/document/path/95833
+func (ctr *Oauth) GetUserDetail(req *GetUserDetailRequest) (*GetUserDetailResponse, error) {
+	var (
+		accessToken string
+		err         error
 	)
-	if err != nil {
-		return
+	if accessToken, err = ctr.GetAccessToken(); err != nil {
+		return nil, err
 	}
-	err = json.Unmarshal(response, &result)
-	if result.ErrCode != 0 {
-		err = fmt.Errorf("GetUserAccessToken error : errcode=%v , errmsg=%v", result.ErrCode, result.ErrMsg)
-		return
+	var response []byte
+	if response, err = util.PostJSON(fmt.Sprintf(getUserDetailURL, accessToken), req); err != nil {
+		return nil, err
 	}
-	return
+	result := &GetUserDetailResponse{}
+	err = util.DecodeWithError(response, result, "GetUserDetail")
+	return result, err
 }
