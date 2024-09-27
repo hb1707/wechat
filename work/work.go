@@ -107,3 +107,11 @@ func (wk *Work) GetServer(req *http.Request, writer http.ResponseWriter) *server
 	srv.Writer = writer
 	return srv
 }
+
+// GetServer 消息管理：接收事件，被动回复消息管理
+func (wk *Work) GetServer(req *http.Request, writer http.ResponseWriter) *server.Server {
+	srv := server.NewServer(wk.ctx)
+	srv.Request = req
+	srv.Writer = writer
+	return srv
+}
