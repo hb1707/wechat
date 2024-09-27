@@ -9,6 +9,7 @@ import (
 	"github.com/silenceper/wechat/v2/work/context"
 	"github.com/silenceper/wechat/v2/work/externalcontact"
 	"github.com/silenceper/wechat/v2/work/invoice"
+	"github.com/silenceper/wechat/v2/work/js"
 	"github.com/silenceper/wechat/v2/work/kf"
 	"github.com/silenceper/wechat/v2/work/material"
 	"github.com/silenceper/wechat/v2/work/message"
@@ -90,4 +91,9 @@ func (wk *Work) GetInvoice() *invoice.Client {
 // GetCheckin 获取打卡接口实例
 func (wk *Work) GetCheckin() *checkin.Client {
 	return checkin.NewClient(wk.ctx)
+}
+
+// GetJs js-sdk配置
+func (wk *Work) GetJs() *js.Js {
+	return js.NewJs(wk.ctx)
 }
