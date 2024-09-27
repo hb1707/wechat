@@ -13,22 +13,21 @@ const (
 	userInfoURL = "https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=%s&userid=%s"
 	updateURL   = "https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=%s&department_id=%s&fetch_child=1"
 	userListURL = "https://qyapi.weixin.qq.com/cgi-bin/user/get"
-	launchCode  = "https://qyapi.weixin.qq.com/cgi-bin/get_launch_code?access_token=%s"
 )
 
-//User 用户管理
+// User 用户管理
 type User struct {
 	*context.Context
 }
 
-//NewUser 实例化
+// NewUser 实例化
 func NewUser(context *context.Context) *User {
 	user := new(User)
 	user.Context = context
 	return user
 }
 
-//Info 用户基本信息
+// Info 用户基本信息
 type Info struct {
 	util.CommonError
 	Userid         string `json:"userid"`
@@ -100,7 +99,7 @@ type OpenidList struct {
 	NextOpenID string `json:"next_openid"`
 }
 
-//GetUserInfo 获取用户基本信息
+// GetUserInfo 获取用户基本信息
 func (user *User) GetUserInfo(userID string) (userInfo *Info, err error) {
 	var accessToken string
 	accessToken, err = user.GetAccessToken()
@@ -192,35 +191,4 @@ func (user *User) ListAllUserOpenIDs() ([]string, error) {
 			return openids, nil
 		}
 	}
-}
-
-type RespLaunchCode struct {
-	util.CommonError
-	LaunchCode string `json:"launch_code"`
-}
-
-//GetLaunchCode 用于打开个人聊天窗口schema
-func (user *User) GetLaunchCode(userID, other string) (userInfo *RespLaunchCode, err error) {
-	var accessToken string
-	accessToken, err = user.GetAccessToken()
-	if err != nil {
-		return
-	}
-
-	uri := fmt.Sprintf(launchCode, accessToken)
-	var response []byte
-	response, err = util.PostJSON(uri, map[string]interface{}{"operator_userid": userID, "single_chat": map[string]string{"userid": other}})
-	if err != nil {
-		return
-	}
-	userInfo = new(RespLaunchCode)
-	err = json.Unmarshal(response, userInfo)
-	if err != nil {
-		return
-	}
-	if userInfo.ErrCode != 0 {
-		err = fmt.Errorf("GetUserInfo Error , errcode=%d , errmsg=%s", userInfo.ErrCode, userInfo.ErrMsg)
-		return
-	}
-	return
 }

@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-
 	"github.com/silenceper/wechat/v2/miniprogram/context"
+	"strings"
 )
 
 // Encryptor struct
@@ -108,13 +108,23 @@ func GetCipherText(sessionKey, encryptedData, iv string) ([]byte, error) {
 }
 
 // Decrypt 解密数据
-func (encryptor *Encryptor) Decrypt(sessionKey, encryptedData, iv string) (*PlainData, error) {
+func (encryptor *Encryptor) Decrypt(sessionKey, encryptedData, appid string) (*PlainData, error) {
+	ivB := make([]byte, 16)
+	iv := base64.StdEncoding.EncodeToString(ivB)
 	cipherText, err := GetCipherText(sessionKey, encryptedData, iv)
 	if err != nil {
 		return nil, err
 	}
+	length := string(cipherText[:20])
+
+	cipherTextData := strings.TrimPrefix(string(cipherText), string(cipherText[:20]))
+	cipherTextData = strings.TrimSuffix(cipherTextData, appid)
+
+	if len(length) != len(cipherTextData) {
+		return nil, fmt.Errorf("length not match, %d != %d", length, len(cipherTextData))
+	}
 	var plainData PlainData
-	err = json.Unmarshal(cipherText, &plainData)
+	err = json.Unmarshal([]byte(cipherTextData), &plainData)
 	if err != nil {
 		return nil, err
 	}

@@ -9,12 +9,15 @@ import (
 	"github.com/silenceper/wechat/v2/work/context"
 	"github.com/silenceper/wechat/v2/work/externalcontact"
 	"github.com/silenceper/wechat/v2/work/invoice"
+	"github.com/silenceper/wechat/v2/work/js"
 	"github.com/silenceper/wechat/v2/work/kf"
 	"github.com/silenceper/wechat/v2/work/material"
 	"github.com/silenceper/wechat/v2/work/message"
 	"github.com/silenceper/wechat/v2/work/msgaudit"
 	"github.com/silenceper/wechat/v2/work/oauth"
 	"github.com/silenceper/wechat/v2/work/robot"
+	"github.com/silenceper/wechat/v2/work/server"
+	"net/http"
 )
 
 // Work 企业微信
@@ -90,4 +93,17 @@ func (wk *Work) GetInvoice() *invoice.Client {
 // GetCheckin 获取打卡接口实例
 func (wk *Work) GetCheckin() *checkin.Client {
 	return checkin.NewClient(wk.ctx)
+}
+
+// GetJs js-sdk配置
+func (wk *Work) GetJs() *js.Js {
+	return js.NewJs(wk.ctx)
+}
+
+// GetServer 消息管理：接收事件，被动回复消息管理
+func (wk *Work) GetServer(req *http.Request, writer http.ResponseWriter) *server.Server {
+	srv := server.NewServer(wk.ctx)
+	srv.Request = req
+	srv.Writer = writer
+	return srv
 }
