@@ -10,11 +10,11 @@ import (
 	"github.com/silenceper/wechat/v2/util"
 )
 
-// 获取ticket的url  https://developer.work.weixin.qq.com/document/path/90506
+//获取ticket的url  https://developer.work.weixin.qq.com/document/path/90506
 const getQyWxTicketURL = "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=%s"
 const getQyAppTicketURL = "https://qyapi.weixin.qq.com/cgi-bin/ticket/get?access_token=%s&type=agent_config"
 
-// WorkJsTicket 默认获取js ticket方法
+//WorkJsTicket 默认获取js ticket方法
 type WorkJsTicket struct {
 	appID          string
 	agentID        string
@@ -24,7 +24,7 @@ type WorkJsTicket struct {
 	jsAPITicketLock *sync.Mutex
 }
 
-// NewWorkJsTicket new
+//NewWorkJsTicket new
 func NewWorkJsTicket(appID string, agentID string, cacheKeyPrefix string, cache cache.Cache) JsTicketHandle {
 	return &WorkJsTicket{
 		appID:           appID,
@@ -35,7 +35,7 @@ func NewWorkJsTicket(appID string, agentID string, cacheKeyPrefix string, cache 
 	}
 }
 
-// GetTicket 获取企业微信jsapi_ticket
+//GetTicket 获取企业微信jsapi_ticket
 func (js *WorkJsTicket) GetTicket(accessToken string) (ticketStr string, err error) {
 	//先从cache中取
 	jsAPITicketCacheKey := fmt.Sprintf("%s_jsapi_ticket_%s", js.cacheKeyPrefix, js.appID)
@@ -62,7 +62,7 @@ func (js *WorkJsTicket) GetTicket(accessToken string) (ticketStr string, err err
 	return
 }
 
-// GetQyWxTicketFromServer 从企业微信服务器中获取ticket
+//GetQyWxTicketFromServer 从企业微信服务器中获取ticket
 func GetQyWxTicketFromServer(accessToken string, isApp bool) (ticket ResTicket, err error) {
 	var response []byte
 	url := fmt.Sprintf(getQyWxTicketURL, accessToken)
