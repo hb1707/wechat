@@ -24,7 +24,7 @@ type (
 		// 消息类型，此时固定为：text
 		MsgType string `json:"msgtype"`
 		// 企业应用的id，整型。企业内部开发，可在应用的设置页面查看；第三方服务商，可通过接口 获取企业授权信息 获取该参数值
-		AgentID string `json:"agentid"`
+		AgentID int `json:"agentid"`
 		// 表示是否是保密消息，0表示可对外分享，1表示不能分享且内容显示水印，默认为0
 		Safe int `json:"safe"`
 		// 表示是否开启id转译，0表示否，1表示是，默认0。仅第三方应用需要用到，企业自建应用可以忽略。
